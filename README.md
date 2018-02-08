@@ -1,8 +1,8 @@
 # Docker image for nvPY
 nvPY is a simplenote-syncing note-taking tool.
-I created this image to support emoji (pictograms).
+The main purpose of this image is to build the nvPY and related softwares for support emoji (pictograms).
 
-## Usage
-```
-./run.sh
+## Installation
+```bash
+$ docker run yuuki0xff/nvpy get-tarball |sudo tar xvC /
 ```

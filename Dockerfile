@@ -15,10 +15,10 @@ ENV TCL_URL=https://prdownloads.sourceforge.net/tcl/tcl${TCL_VERSION}-src.tar.gz
 ENV TK_URL=https://prdownloads.sourceforge.net/tcl/tk${TK_VERSION}-src.tar.gz
 ENV PY_URL=https://github.com/python/cpython/archive/${PY_BRANCH}.tar.gz
 
-# checkinstall options
-ENV PKG_RELEASE=0
-ENV PKG_SUFFIX=custom
-ENV PKG_MAINTAINER="yuuki0xff@gmail.com"
+# build options
+ENV PREFIX=/opt/nvpy
+ENV LD_LIBRARY_PATH=$PREFIX/lib
+RUN mkdir -p $PREFIX/bin $PREFIX/include $PREFIX/lib $PREFIX/share
 
 # install build dependencies.
 ENV DEBIAN_FRONTEND=noninteractive
@@ -36,45 +36,44 @@ RUN tar xvf /build/tk.tar.gz -C /build/
 RUN wget "$PY_URL" -O /build/cpython.tar.gz
 RUN tar xvf /build/cpython.tar.gz -C /build/
 
-# add helper script.
-ADD chkinstall.sh /build/
-RUN chmod +x /build/chkinstall.sh
-
 # build TCL.
 WORKDIR /build/tcl${TCL_VERSION}/unix
-RUN pwd
-RUN ./configure --enable-threads --enable-shared --enable-symbols --enable-64bit --enable-langinfo --enable-man-symlinks
+RUN ./configure --prefix=$PREFIX --enable-threads --enable-shared --enable-symbols --enable-64bit --enable-langinfo --enable-man-symlinks
 RUN make clean
 RUN make
-RUN /build/chkinstall.sh tcl "$TCL_VERSION"
+RUN make install
 
 # build TK.
 WORKDIR /build/tk${TK_VERSION}/unix
-RUN ./configure --enable-threads --enable-shared --enable-symbols --enable-64bit --enable-man-symlinks
+RUN ./configure --prefix=$PREFIX --enable-threads --enable-shared --enable-symbols --enable-64bit --enable-man-symlinks
 RUN make clean
 RUN make
-RUN /build/chkinstall.sh tk "$TK_VERSION"
+RUN make install
 
 # build Cpython.
 WORKDIR /build/cpython-2.7
-RUN ./configure --enable-shared --enable-optimizations --enable-ipv6 --enable-unicode=ucs4 --with-lto --with-signal-module --with-pth --with-wctype-functions --with-tcltk-includes=/usr/local/include/ --with-tcltk-libs=/usr/local/lib/
+RUN ./configure --prefix=$PREFIX --enable-shared --enable-optimizations --enable-ipv6 --enable-unicode=ucs4 --with-lto --with-signal-module --with-pth --with-wctype-functions --with-tcltk-includes=/usr/local/include/ --with-tcltk-libs=/usr/local/lib/
 RUN make clean
 RUN make
-# checkinstallでは上手くインストールできない。
 RUN make install
 
 
 FROM debian:sid
-COPY --from=builder /usr/local/ /usr_local
-ADD https://github.com/cpbotha/nvpy/archive/master.tar.gz /srv/nvpy.tar.gz
-RUN rm -rf /usr/local/ && mv /usr_local/ /usr/local/ && \
+ENV PREFIX=/opt/nvpy \
+	LD_LIBRARY_PATH=$PREFIX/lib
+COPY --from=builder $PREFIX/ $PREFIX/
+ADD https://github.com/cpbotha/nvpy/archive/master.tar.gz $PREFIX/nvpy.tar.gz
+RUN \
 	ldconfig && \
-	tar xf /srv/nvpy.tar.gz -C /srv/ && \
-	echo "deb     http://httpredir.debian.org/debian sid main"  >/etc/apt/sources.list && \
-	echo "deb-src http://httpredir.debian.org/debian sid main" >>/etc/apt/sources.list && \
-	DEBIAN_FRONTEND=noninteractive apt update && \
-	DEBIAN_FRONTEND=noninteractive apt -y upgrade && \
-	DEBIAN_FRONTEND=noninteractive apt -y install tk8.6-blt2.5 ca-certificates
+	mkdir -p $PREFIX/lib/nvpy/ && \
+	tar xf $PREFIX/nvpy.tar.gz -C $PREFIX/lib/nvpy/ --strip-components=1 && \
+	echo "#!/bin/sh"                                               >/usr/local/bin/nvpy && \
+	echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH"                >>/usr/local/bin/nvpy && \
+	echo "exec $PREFIX/bin/python2 $PREFIX/lib/nvpy/nvpy/nvpy.py" >>/usr/local/bin/nvpy && \
+	chmod +x /usr/local/bin/nvpy && \
+	echo "#!/bin/sh"                          >/usr/local/bin/get-tarball && \
+	echo "tar c $PREFIX /usr/local/bin/nvpy" >>/usr/local/bin/get-tarball && \
+	chmod +x /usr/local/bin/get-tarball
 
-CMD ["python2", "/srv/nvpy-master/nvpy/nvpy.py"]
+CMD ["echo", "This image can not start nvPY.\nPlease execute \"docker run yuuki0xff/nvpy get-tarball |sudo tar xvC /\" to install nvPY."]
 
