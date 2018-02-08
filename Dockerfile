@@ -59,8 +59,7 @@ RUN make install
 
 
 FROM debian:sid
-ENV PREFIX=/opt/nvpy \
-	LD_LIBRARY_PATH=$PREFIX/lib
+ENV PREFIX=/opt/nvpy
 COPY --from=builder $PREFIX/ $PREFIX/
 ADD https://github.com/cpbotha/nvpy/archive/master.tar.gz $PREFIX/nvpy.tar.gz
 RUN \
@@ -68,7 +67,7 @@ RUN \
 	mkdir -p $PREFIX/lib/nvpy/ && \
 	tar xf $PREFIX/nvpy.tar.gz -C $PREFIX/lib/nvpy/ --strip-components=1 && \
 	echo "#!/bin/sh"                                               >/usr/local/bin/nvpy && \
-	echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH"                >>/usr/local/bin/nvpy && \
+	echo "export LD_LIBRARY_PATH=$PREFIX/lib"                     >>/usr/local/bin/nvpy && \
 	echo "exec $PREFIX/bin/python2 $PREFIX/lib/nvpy/nvpy/nvpy.py" >>/usr/local/bin/nvpy && \
 	chmod +x /usr/local/bin/nvpy && \
 	echo "#!/bin/sh"                          >/usr/local/bin/get-tarball && \
