@@ -57,20 +57,26 @@ RUN make clean
 RUN make
 RUN make install
 
-
-FROM busybox
-ENV PREFIX=/opt/nvpy
-COPY --from=builder $PREFIX/ $PREFIX/
+# install nvpy into container
 ADD https://github.com/cpbotha/nvpy/archive/master.tar.gz $PREFIX/nvpy.tar.gz
+RUN mkdir -p $PREFIX/lib/nvpy/
+RUN tar xf $PREFIX/nvpy.tar.gz -C $PREFIX/lib/nvpy/ --strip-components=1
 RUN \
-	mkdir -p $PREFIX/lib/nvpy/ /usr/local/bin/ && \
-	tar xf $PREFIX/nvpy.tar.gz -C $PREFIX/lib/nvpy/ --strip-components=1 && \
 	echo "#!/bin/sh"                                               >/usr/local/bin/nvpy && \
 	echo "export LD_LIBRARY_PATH=$PREFIX/lib"                     >>/usr/local/bin/nvpy && \
 	echo "exec $PREFIX/bin/python2 $PREFIX/lib/nvpy/nvpy/nvpy.py" >>/usr/local/bin/nvpy && \
-	chmod +x /usr/local/bin/nvpy && \
+	chmod +x /usr/local/bin/nvpy
+
+# make tarball
+RUN tar cv $PREFIX /usr/local/bin/nvpy |gzip --best >/output.tar.gz
+
+FROM busybox
+ENV PREFIX=/opt/nvpy
+COPY --from=builder /output.tar.gz /output.tar.gz
+RUN \
+	mkdir -p /usr/local/bin/ && \
 	echo "#!/bin/sh"                          >/usr/local/bin/get-tarball && \
-	echo "tar c $PREFIX /usr/local/bin/nvpy" >>/usr/local/bin/get-tarball && \
+	echo "zcat /output.tar.gz" >>/usr/local/bin/get-tarball && \
 	chmod +x /usr/local/bin/get-tarball
 
 CMD ["echo", "This image can not start nvPY.\nPlease execute \"docker run yuuki0xff/nvpy get-tarball |sudo tar xvC /\" to install nvPY."]
