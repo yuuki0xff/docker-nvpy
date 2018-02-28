@@ -79,5 +79,5 @@ RUN \
 	echo "zcat /output.tar.gz" >>/usr/local/bin/get-tarball && \
 	chmod +x /usr/local/bin/get-tarball
 
-CMD ["echo", "This image can not start nvPY.\nPlease execute \"docker run yuuki0xff/nvpy get-tarball |sudo tar xvC /\" to install nvPY."]
+CMD ["echo", "This image can not start nvPY.\nPlease execute \"sudo rm -rf /opt/nvpy/ && docker run --rm yuuki0xff/nvpy get-tarball |sudo tar xvC /\" to install nvPY."]
 
