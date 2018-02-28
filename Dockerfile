@@ -58,13 +58,12 @@ RUN make
 RUN make install
 
 
-FROM debian:sid
+FROM busybox
 ENV PREFIX=/opt/nvpy
 COPY --from=builder $PREFIX/ $PREFIX/
 ADD https://github.com/cpbotha/nvpy/archive/master.tar.gz $PREFIX/nvpy.tar.gz
 RUN \
-	ldconfig && \
-	mkdir -p $PREFIX/lib/nvpy/ && \
+	mkdir -p $PREFIX/lib/nvpy/ /usr/local/bin/ && \
 	tar xf $PREFIX/nvpy.tar.gz -C $PREFIX/lib/nvpy/ --strip-components=1 && \
 	echo "#!/bin/sh"                                               >/usr/local/bin/nvpy && \
 	echo "export LD_LIBRARY_PATH=$PREFIX/lib"                     >>/usr/local/bin/nvpy && \
