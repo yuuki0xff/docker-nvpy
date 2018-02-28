@@ -58,9 +58,9 @@ RUN make
 RUN make install
 
 # install nvpy into container
-ADD https://github.com/cpbotha/nvpy/archive/master.tar.gz $PREFIX/nvpy.tar.gz
+ADD https://github.com/cpbotha/nvpy/archive/master.tar.gz /tmp/nvpy.tar.gz
 RUN mkdir -p $PREFIX/lib/nvpy/
-RUN tar xf $PREFIX/nvpy.tar.gz -C $PREFIX/lib/nvpy/ --strip-components=1
+RUN tar xf /tmp/nvpy.tar.gz -C $PREFIX/lib/nvpy/ --strip-components=1
 RUN \
 	echo "#!/bin/sh"                                               >/usr/local/bin/nvpy && \
 	echo "export LD_LIBRARY_PATH=$PREFIX/lib"                     >>/usr/local/bin/nvpy && \
