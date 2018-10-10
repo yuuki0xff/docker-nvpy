@@ -57,6 +57,14 @@ RUN make clean
 RUN make
 RUN make install
 
+# install pip
+WORKDIR /build
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN $PREFIX/bin/python2 get-pip.py
+
+# install dependencies
+RUN $PREFIX/bin/python2 -m pip install 'Markdown' 'docutils' 'simplenote>=2.0.0'
+
 # install nvpy into container
 ADD https://github.com/cpbotha/nvpy/archive/master.tar.gz /tmp/nvpy.tar.gz
 RUN mkdir -p $PREFIX/lib/nvpy/
