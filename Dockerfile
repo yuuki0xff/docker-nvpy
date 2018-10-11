@@ -70,7 +70,7 @@ RUN $PREFIX/bin/python2 ./setup.py install
 RUN \
 	echo "#!/bin/sh"                                               >/usr/local/bin/nvpy && \
 	echo "export LD_LIBRARY_PATH=$PREFIX/lib"                     >>/usr/local/bin/nvpy && \
-	echo "exec $PREFIX/bin/python2 -m nvpy"                       >>/usr/local/bin/nvpy && \
+	echo "exec $PREFIX/bin/python2 -m nvpy "'"$@"'                >>/usr/local/bin/nvpy && \
 	chmod +x /usr/local/bin/nvpy
 
 # make tarball
