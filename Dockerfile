@@ -62,17 +62,15 @@ WORKDIR /build
 RUN wget https://bootstrap.pypa.io/get-pip.py
 RUN $PREFIX/bin/python2 get-pip.py
 
-# install dependencies
-RUN $PREFIX/bin/python2 -m pip install 'Markdown' 'docutils' 'simplenote>=2.0.0'
-
 # install nvpy into container
-ADD https://github.com/cpbotha/nvpy/archive/master.tar.gz /tmp/nvpy.tar.gz
-RUN mkdir -p $PREFIX/lib/nvpy/
-RUN tar xf /tmp/nvpy.tar.gz -C $PREFIX/lib/nvpy/ --strip-components=1
+RUN wget https://github.com/cpbotha/nvpy/archive/master.tar.gz -O /build/nvpy.tar.gz
+WORKDIR /build/nvpy
+RUN tar xvf /build/nvpy.tar.gz --strip-components=1
+RUN $PREFIX/bin/python2 ./setup.py install
 RUN \
 	echo "#!/bin/sh"                                               >/usr/local/bin/nvpy && \
 	echo "export LD_LIBRARY_PATH=$PREFIX/lib"                     >>/usr/local/bin/nvpy && \
-	echo "exec $PREFIX/bin/python2 $PREFIX/lib/nvpy/nvpy/nvpy.py" >>/usr/local/bin/nvpy && \
+	echo "exec $PREFIX/bin/python2 -m nvpy"                       >>/usr/local/bin/nvpy && \
 	chmod +x /usr/local/bin/nvpy
 
 # make tarball
