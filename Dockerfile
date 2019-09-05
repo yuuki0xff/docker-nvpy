@@ -33,7 +33,8 @@ RUN tar xvf /build/tcl.tar.gz -C /build/
 RUN wget "$TK_URL" -O /build/tk.tar.gz
 RUN tar xvf /build/tk.tar.gz -C /build/
 RUN wget "$PY_URL" -O /build/cpython.tar.gz
-RUN tar xvf /build/cpython.tar.gz -C /build/
+RUN mkdir /build/cpython-2.7
+RUN tar xvf /build/cpython.tar.gz -C /build/cpython-2.7 --strip-components 1
 
 # build TCL.
 WORKDIR /build/tcl${TCL_VERSION}/unix
