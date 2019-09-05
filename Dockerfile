@@ -5,8 +5,8 @@ RUN echo "deb-src http://httpredir.debian.org/debian sid main" >>/etc/apt/source
 # build settings
 ENV CFLAGS=-DTCL_UTF_MAX=6
 ENV MAKEFLAGS=-j5
-ENV TCL_VERSION=8.6.8
-ENV TK_VERSION=8.6.8
+ENV TCL_VERSION=8.6.9
+ENV TK_VERSION=8.6.9
 ENV PY_BRANCH=2.7
 ENV PY_VERSION=2.7.14+
 
