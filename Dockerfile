@@ -7,13 +7,12 @@ ENV CFLAGS=-DTCL_UTF_MAX=6
 ENV MAKEFLAGS=-j5
 ENV TCL_VERSION=8.6.9
 ENV TK_VERSION=8.6.9
-ENV PY_BRANCH=2.7
-ENV PY_VERSION=2.7.14+
+ENV PY_VERSION=2.7.16
 
 # url
 ENV TCL_URL=https://prdownloads.sourceforge.net/tcl/tcl${TCL_VERSION}-src.tar.gz
 ENV TK_URL=https://prdownloads.sourceforge.net/tcl/tk${TK_VERSION}-src.tar.gz
-ENV PY_URL=https://github.com/python/cpython/archive/${PY_BRANCH}.tar.gz
+ENV PY_URL=https://github.com/python/cpython/archive/v${PY_VERSION}.tar.gz
 
 # build options
 ENV PREFIX=/opt/nvpy
