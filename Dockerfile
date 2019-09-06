@@ -7,7 +7,7 @@ ENV CFLAGS=-DTCL_UTF_MAX=6
 ENV MAKEFLAGS=-j5
 ENV TCL_VERSION=8.6.9
 ENV TK_VERSION=8.6.9
-ENV PY_VERSION=2.7.16
+ENV PY_VERSION=3.7.4
 
 # url
 ENV TCL_URL=https://prdownloads.sourceforge.net/tcl/tcl${TCL_VERSION}-src.tar.gz
@@ -24,7 +24,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update
 RUN apt -y upgrade
 RUN apt -y install build-essential checkinstall wget libx11-dev
-RUN apt -y build-dep -y tcl tk python2.7
+RUN apt -y build-dep -y tcl tk python3.7
 
 # download source codes.
 RUN mkdir /build/
@@ -33,8 +33,8 @@ RUN tar xvf /build/tcl.tar.gz -C /build/
 RUN wget "$TK_URL" -O /build/tk.tar.gz
 RUN tar xvf /build/tk.tar.gz -C /build/
 RUN wget "$PY_URL" -O /build/cpython.tar.gz
-RUN mkdir /build/cpython-2.7
-RUN tar xvf /build/cpython.tar.gz -C /build/cpython-2.7 --strip-components 1
+RUN mkdir /build/cpython-3.7
+RUN tar xvf /build/cpython.tar.gz -C /build/cpython-3.7 --strip-components 1
 
 # build TCL.
 WORKDIR /build/tcl${TCL_VERSION}/unix
@@ -51,7 +51,7 @@ RUN make
 RUN make install
 
 # build Cpython.
-WORKDIR /build/cpython-2.7
+WORKDIR /build/cpython-3.7
 RUN ./configure --prefix=$PREFIX --enable-shared --enable-optimizations --enable-ipv6 --enable-unicode=ucs4 --with-lto --with-signal-module --with-pth --with-wctype-functions --with-tcltk-includes=/usr/local/include/ --with-tcltk-libs=/usr/local/lib/
 RUN make clean
 RUN make
@@ -60,17 +60,17 @@ RUN make install
 # install pip
 WORKDIR /build
 RUN wget https://bootstrap.pypa.io/get-pip.py
-RUN $PREFIX/bin/python2 get-pip.py
+RUN $PREFIX/bin/python3 get-pip.py
 
 # install nvpy into container
 RUN wget https://github.com/cpbotha/nvpy/archive/master.tar.gz -O /build/nvpy.tar.gz
 WORKDIR /build/nvpy
 RUN tar xvf /build/nvpy.tar.gz --strip-components=1
-RUN $PREFIX/bin/python2 ./setup.py install
+RUN $PREFIX/bin/python3 ./setup.py install
 RUN \
 	echo "#!/bin/sh"                                               >/usr/local/bin/nvpy && \
 	echo "export LD_LIBRARY_PATH=$PREFIX/lib"                     >>/usr/local/bin/nvpy && \
-	echo "exec $PREFIX/bin/python2 -m nvpy "'"$@"'                >>/usr/local/bin/nvpy && \
+	echo "exec $PREFIX/bin/python3 -m nvpy "'"$@"'                >>/usr/local/bin/nvpy && \
 	chmod +x /usr/local/bin/nvpy
 
 # make tarball
