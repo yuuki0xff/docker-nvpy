@@ -38,21 +38,18 @@ RUN tar xvf /build/cpython.tar.gz -C /build/cpython-3.7 --strip-components 1
 # build TCL.
 WORKDIR /build/tcl${TCL_VERSION}/unix
 RUN ./configure --prefix=$PREFIX --enable-threads --enable-shared --enable-symbols --enable-64bit --enable-langinfo --enable-man-symlinks
-RUN make clean
 RUN make
 RUN make install
 
 # build TK.
 WORKDIR /build/tk${TK_VERSION}/unix
 RUN ./configure --prefix=$PREFIX --enable-threads --enable-shared --enable-symbols --enable-64bit --enable-man-symlinks
-RUN make clean
 RUN make
 RUN make install
 
 # build Cpython.
 WORKDIR /build/cpython-3.7
 RUN ./configure --prefix=$PREFIX --enable-shared --enable-optimizations --enable-ipv6 --enable-unicode=ucs4 --with-lto --with-signal-module --with-pth --with-wctype-functions --with-tcltk-includes=/usr/local/include/ --with-tcltk-libs=/usr/local/lib/
-RUN make clean
 RUN make
 RUN make install
 
