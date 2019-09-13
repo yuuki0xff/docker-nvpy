@@ -1,6 +1,12 @@
 FROM debian:sid as builder
 RUN echo "deb     http://httpredir.debian.org/debian sid main"  >/etc/apt/sources.list
 RUN echo "deb-src http://httpredir.debian.org/debian sid main" >>/etc/apt/sources.list
+# install build dependencies.
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt update
+RUN apt -y upgrade
+RUN apt -y install build-essential checkinstall wget libx11-dev
+RUN apt -y build-dep tcl tk python3.7
 
 # build settings
 ENV CFLAGS=-DTCL_UTF_MAX=6
@@ -18,13 +24,6 @@ ENV PY_URL=https://github.com/python/cpython/archive/v${PY_VERSION}.tar.gz
 ENV PREFIX=/opt/nvpy
 ENV LD_LIBRARY_PATH=$PREFIX/lib
 RUN mkdir -p $PREFIX/bin $PREFIX/include $PREFIX/lib $PREFIX/share
-
-# install build dependencies.
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update
-RUN apt -y upgrade
-RUN apt -y install build-essential checkinstall wget libx11-dev
-RUN apt -y build-dep -y tcl tk python3.7
 
 # download source codes.
 RUN mkdir /build/
