@@ -59,10 +59,10 @@ RUN wget https://bootstrap.pypa.io/get-pip.py
 RUN $PREFIX/bin/python3 get-pip.py
 
 # install nvpy into container
-RUN wget https://github.com/cpbotha/nvpy/archive/master.tar.gz -O /build/nvpy.tar.gz
-WORKDIR /build/nvpy
-RUN tar xvf /build/nvpy.tar.gz --strip-components=1
-RUN $PREFIX/bin/python3 ./setup.py install
+# RUN wget https://github.com/cpbotha/nvpy/archive/master.tar.gz -O /build/nvpy.tar.gz
+# WORKDIR /build/nvpy
+# RUN tar xvf /build/nvpy.tar.gz --strip-components=1
+# RUN $PREFIX/bin/python3 ./setup.py install
 RUN \
 	echo "#!/bin/sh"                                               >/usr/local/bin/nvpy && \
 	echo "export LD_LIBRARY_PATH=$PREFIX/lib"                     >>/usr/local/bin/nvpy && \
